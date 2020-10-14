@@ -207,32 +207,32 @@ void CUIDlg::initUIDlgs()
 	int iRow = ROW_NUM;
 	m_views = new CVIEW[SUB_DLG_NUM];
 
-	//int iScreenWidth = GetSystemMetrics(SM_CXSCREEN);
-	//int iScreenHeight = GetSystemMetrics(SM_CYSCREEN);
+	int iScreenWidth = GetSystemMetrics(SM_CXSCREEN);
+	int iScreenHeight = GetSystemMetrics(SM_CYSCREEN);
 
-	//MoveWindow(0, 0, iScreenWidth, iScreenHeight);
+	MoveWindow(0, 0, iScreenWidth, iScreenHeight);
 
-	//CRect rectMainDlg;
-	//GetClientRect(&rectMainDlg);
+	CRect rectMainDlg;
+	GetClientRect(&rectMainDlg);
 
-	//for (int i = 0; i < SUB_DLG_NUM; i++)
-	//{
-	//	CRect rect;
-	//	/*int nWidth = rectMainDlg.Width() / iColum;
-	//	int nHeight = rectMainDlg.Height() / iRow;*/
-	//	int nWidth = 800;
-	//	int nHeight = 600;
+	for (int i = 0; i < SUB_DLG_NUM; i++)
+	{
+		CRect rect;
+		/*int nWidth = rectMainDlg.Width() / iColum;
+		int nHeight = rectMainDlg.Height() / iRow;*/
+		int nWidth = 800;
+		int nHeight = 600;
 
-	//	rect.SetRect(
-	//		rectMainDlg.TopLeft().x + (i % iColum) * nWidth,
-	//		rectMainDlg.TopLeft().y + (i / iColum) * nHeight,
-	//		rectMainDlg.TopLeft().x + (i % iColum + 1) * nWidth,
-	//		rectMainDlg.TopLeft().y + ((i / iColum) + 1) * nHeight);
+		rect.SetRect(
+			rectMainDlg.TopLeft().x + (i % iColum) * nWidth,
+			rectMainDlg.TopLeft().y + (i / iColum) * nHeight,
+			rectMainDlg.TopLeft().x + (i % iColum + 1) * nWidth,
+			rectMainDlg.TopLeft().y + ((i / iColum) + 1) * nHeight);
 
-	//	m_pMypicDlgs[i].setRect(&rect);
-	//	m_pMypicDlgs[i].Create(IDD_VIEW, this);
-	//	m_pMypicDlgs[i].ShowWindow(SW_SHOW);
-	//}
+		m_views[i].setDlgRect(&rect);
+		m_views[i].Create(IDD_VIEW, this);
+		m_views[i].ShowWindow(SW_SHOW);
+	}
 	
 }
 void CUIDlg::OnClose()

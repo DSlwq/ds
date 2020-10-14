@@ -54,13 +54,15 @@ BOOL CVIEW::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
+	MoveWindow(m_Rect);//初始化界面位置
+
 	// TODO:  在此添加额外的初始化
 	/////////////////////控制台
 	AllocConsole();
 	FILE *stream;
 	freopen_s(&stream, "CONOUT$", "w", stdout);
 
-	GetClientRect(m_Rect);
+	//GetClientRect(m_Rect);
 	return TRUE;  // return TRUE unless you set the focus to a control
 				  // 异常: OCX 属性页应返回 FALSE
 }
@@ -186,6 +188,18 @@ void CVIEW::OnRButtonUp(UINT nFlags, CPoint point)
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
 
 	CDialogEx::OnRButtonUp(nFlags, point);
+}
+
+void CVIEW::setDlgRect(CRect rect)
+{
+	m_Rect = rect;
+	
+}
+
+void CVIEW::setDlgPic(CString pic)
+{
+	Picture = pic;
+	Invalidate(FALSE);//更新界面
 }
 
 void CVIEW::CImageToMat(CImage & cimage, cv::Mat & mat)
@@ -329,7 +343,7 @@ void CVIEW::GDIInvalidate()
 	MemBitmap.CreateCompatibleBitmap(&dc, m_Rect.Width(), m_Rect.Height());
 	// 选取空白位图 
 	memDC.SelectObject(MemBitmap);
-	memDC.FillSolidRect(0, 0, m_Rect.Width(), m_Rect.Height(), RGB(255, 255, 255));
+	memDC.FillSolidRect(0, 0, m_Rect.Width(), m_Rect.Height(), RGB(34,34,34));
 	//画图 
 	Draw(&memDC);
 	//拷贝到控件DC 

@@ -29,17 +29,25 @@ protected:
 protected:
 
 	
-
 	CInitGdiplus m_InitGdiplus;//初始化GDI
 
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
+	afx_msg void OnMButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnMButtonUp(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
 
 private:
-	REAL      m_zoom; //缩放系数
+
 	CRect     m_Rect; //对话框的矩形区域
 
+	REAL      m_zoom; //缩放系数
 	REAL      m_imgX; //图片左上角X轴偏移量
 	REAL      m_imgY; //图片左上角Y轴偏移量
-
 	PointF    m_PtStart; //按下鼠标中键，记录当前的m_imgX,m_imgY
 	PointF    m_mouseDown; //按下鼠标中键时，鼠标在图片控件中的位置；
 	bool     m_mousepressed; //记录是否按下了鼠标中键
@@ -60,18 +68,12 @@ private:
 	COLORREF m_Color;
 
 public:
+	//初始化接口
 	CString Picture;
 
+	void setDlgRect(CRect rect);//修改界面大小位置
 
-	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
-	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
-	afx_msg void OnMButtonDown(UINT nFlags, CPoint point);
-	afx_msg void OnMButtonUp(UINT nFlags, CPoint point);
-	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
-	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
-	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
-	afx_msg void OnSize(UINT nType, int cx, int cy);
-	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
+	void setDlgPic(CString pic);//设置显示图片名
 
 
 protected:
@@ -81,4 +83,6 @@ protected:
 public:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnPaint();
+
+
 };
