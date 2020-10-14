@@ -204,9 +204,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CInitGdiplus.h" />
+    <ClInclude Include="CVIEW.h" />
     <ClInclude Include="DlgProxy.h" />
     <ClInclude Include="framework.h" />
-    <ClInclude Include="Mypic.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
@@ -215,8 +215,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CInitGdiplus.cpp" />
+    <ClCompile Include="CVIEW.cpp" />
     <ClCompile Include="DlgProxy.cpp" />
-    <ClCompile Include="Mypic.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

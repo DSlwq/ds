@@ -39,7 +39,7 @@
     <ClInclude Include="CInitGdiplus.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Mypic.h">
+    <ClInclude Include="CVIEW.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -59,7 +59,7 @@
     <ClCompile Include="CInitGdiplus.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Mypic.cpp">
+    <ClCompile Include="CVIEW.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

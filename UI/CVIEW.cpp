@@ -1,39 +1,40 @@
-﻿// Mypic.cpp: 实现文件
+﻿// CVIEW.cpp: 实现文件
 //
 
 #include "pch.h"
 #include "UI.h"
-#include "Mypic.h"
+#include "CVIEW.h"
 #include "afxdialogex.h"
 
-#include <iostream>
-using namespace std;
-// Mypic 对话框
 
-IMPLEMENT_DYNAMIC(Mypic, CDialogEx)
+// CVIEW 对话框
 
-Mypic::Mypic(CWnd* pParent /*=nullptr*/)
+IMPLEMENT_DYNAMIC(CVIEW, CDialogEx)
+
+CVIEW::CVIEW(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_VIEW, pParent)
 {
-	m_Color = COLORREF(RGB(255, 0, 0));
+	m_zoom = 1.0f;
+
+	m_imgX = 0.0f;
+	m_imgY = 0.0f;
+	m_PtStart.X = 0.0f;
+	m_PtStart.Y = 0.0f;
+	m_mousepressed = false;
+	Picture = "456.bmp";
 }
 
-Mypic::~Mypic()
+CVIEW::~CVIEW()
 {
 }
 
-void Mypic::setRect(CRect rect)
-{
-	m_rectDlg = rect;
-}
-
-void Mypic::DoDataExchange(CDataExchange* pDX)
+void CVIEW::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 }
 
 
-BEGIN_MESSAGE_MAP(Mypic, CDialogEx)
+BEGIN_MESSAGE_MAP(CVIEW, CDialogEx)
 	ON_WM_MOUSEMOVE()
 	ON_WM_MOUSEWHEEL()
 	ON_WM_MBUTTONDOWN()
@@ -41,43 +42,47 @@ BEGIN_MESSAGE_MAP(Mypic, CDialogEx)
 	ON_WM_LBUTTONDBLCLK()
 	ON_WM_LBUTTONDOWN()
 	ON_WM_LBUTTONUP()
-	ON_WM_SIZE()
+	ON_WM_RBUTTONUP()
 	ON_WM_PAINT()
 END_MESSAGE_MAP()
 
 
-// Mypic 消息处理程序
+// CVIEW 消息处理程序
 
 
-
-BOOL Mypic::OnInitDialog()
+BOOL CVIEW::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-	if (m_rectDlg != NULL) {
-		MoveWindow(m_rectDlg);
-	}
-	
+
 	// TODO:  在此添加额外的初始化
-	m_zoom = 1.0f;
-
-	m_imgX = 0.0f;
-	m_imgY = 0.0f;
-	m_PtStart.X = 0.0f;
-	m_PtStart.Y = 0.0f;
-
-	m_mousepressed = false;
-
-
-	Picture = "123.bmp";
+	/////////////////////控制台
+	AllocConsole();
+	FILE *stream;
+	freopen_s(&stream, "CONOUT$", "w", stdout);
 
 	GetClientRect(m_Rect);
-
 	return TRUE;  // return TRUE unless you set the focus to a control
 				  // 异常: OCX 属性页应返回 FALSE
 }
 
+void CVIEW::OnSize(UINT nType, int cx, int cy)
+{
+	//GetClientRect(m_Rect); //在你的实际应用中，可能需要把这行添加到对话框的OnSize()中
 
-void Mypic::OnMouseMove(UINT nFlags, CPoint point)
+	CDialogEx::OnSize(nType, cx, cy);
+
+	// TODO: 在此处添加消息处理程序代码
+	GetClientRect(m_Rect);
+	////根据屏幕大小缩放控件
+	//if (nType != SIZE_MINIMIZED) {
+	//	ReSize();
+	//}
+	//	
+	//this->Invalidate();
+
+}
+
+void CVIEW::OnMouseMove(UINT nFlags, CPoint point)
 {
 	HCURSOR hCur = LoadCursor(NULL, IDC_CROSS);
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
@@ -94,13 +99,13 @@ void Mypic::OnMouseMove(UINT nFlags, CPoint point)
 		::SetCursor(hCur);
 		m_EndPoint = point;
 
-		
+
 	}
+	Invalidate(FALSE);
 	CDialogEx::OnMouseMove(nFlags, point);
 }
 
-
-BOOL Mypic::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
+BOOL CVIEW::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
 	REAL oldzoom = m_zoom; //保存当前的缩放系数，用于计算当前滚动时的坐标
@@ -132,36 +137,32 @@ BOOL Mypic::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 	m_imgX = newimagex - oldimagex + m_imgX; //计算原图应该的偏移
 	m_imgY = newimagey - oldimagey + m_imgY;
 
-	GDIInvalidate(); //绘图
+	Invalidate(FALSE); //绘图
 	return CDialogEx::OnMouseWheel(nFlags, zDelta, pt);
 }
 
-
-void Mypic::OnMButtonDown(UINT nFlags, CPoint point)
+void CVIEW::OnMButtonDown(UINT nFlags, CPoint point)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
 	m_mousepressed = false;
 	CDialogEx::OnMButtonDown(nFlags, point);
 }
 
-
-void Mypic::OnMButtonUp(UINT nFlags, CPoint point)
+void CVIEW::OnMButtonUp(UINT nFlags, CPoint point)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
 	m_click = FALSE;
 	CDialogEx::OnMButtonUp(nFlags, point);
 }
 
-
-void Mypic::OnLButtonDblClk(UINT nFlags, CPoint point)
+void CVIEW::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
 
 	CDialogEx::OnLButtonDblClk(nFlags, point);
 }
 
-
-void Mypic::OnLButtonDown(UINT nFlags, CPoint point)
+void CVIEW::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
 	m_click = TRUE;
@@ -172,8 +173,7 @@ void Mypic::OnLButtonDown(UINT nFlags, CPoint point)
 	CDialogEx::OnLButtonDown(nFlags, point);
 }
 
-
-void Mypic::OnLButtonUp(UINT nFlags, CPoint point)
+void CVIEW::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
 	m_click = false;
@@ -181,27 +181,14 @@ void Mypic::OnLButtonUp(UINT nFlags, CPoint point)
 	CDialogEx::OnLButtonUp(nFlags, point);
 }
 
-
-void Mypic::OnSize(UINT nType, int cx, int cy)
+void CVIEW::OnRButtonUp(UINT nFlags, CPoint point)
 {
-	CDialogEx::OnSize(nType, cx, cy);
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
 
-	// TODO: 在此处添加消息处理程序代码
-	GetClientRect(m_Rect);
+	CDialogEx::OnRButtonUp(nFlags, point);
 }
 
-
-void Mypic::OnPaint()
-{
-	CPaintDC dc(this); // device context for painting
-					   // TODO: 在此处添加消息处理程序代码
-					   // 不为绘图消息调用 CDialogEx::OnPaint()
-	
-	GDIInvalidate();
-	//画矩形框
-}
-
-void Mypic::CImageToMat(CImage & cimage, cv::Mat & mat)
+void CVIEW::CImageToMat(CImage & cimage, cv::Mat & mat)
 {
 	if (true == cimage.IsNull())
 	{
@@ -253,7 +240,7 @@ void Mypic::CImageToMat(CImage & cimage, cv::Mat & mat)
 	}
 }
 
-CImage * Mypic::MatToCImage(cv::Mat & mat, CImage * cimage)
+CImage * CVIEW::MatToCImage(cv::Mat & mat, CImage * cimage)
 {
 	if (0 == mat.total())
 	{
@@ -319,36 +306,33 @@ CImage * Mypic::MatToCImage(cv::Mat & mat, CImage * cimage)
 	return cimage;
 }
 
-void Mypic::Draw(CDC * pDC)
+void CVIEW::Draw(CDC * pDC)
 {
-	Image img(Picture);
+	Image img(Picture);  //注意，请设置你自己的图片</span>
 	Graphics graph(pDC->GetSafeHdc());
-
-	graph.SetInterpolationMode(InterpolationModeHighQualityBilinear); //设置缩放质量
-	graph.ScaleTransform(m_zoom, m_zoom);                             //缩放
-	//cout << "缩放:" << m_zoom << endl;
-	graph.DrawImage(&img, m_imgX, m_imgY);                            //m_imgX,m_imgY是原图应该偏移的量
-	cout << "m_imgX:" << m_imgX << "  " << m_imgY << endl;
+	graph.SetInterpolationMode(InterpolationModeHighQualityBilinear);//设置缩放质量 
+	graph.ScaleTransform(m_zoom, m_zoom);//缩放 
+	graph.DrawImage(&img, m_imgX, m_imgY);//m_imgX,m_imgY是原图应该偏移的量
 }
 
-void Mypic::GDIInvalidate()
+void CVIEW::GDIInvalidate()
 {
-	
+
 	HDC hdc = ::GetDC(m_hWnd);
 	CDC dc;
 	dc.Attach(hdc);
 	CDC memDC;
 	CBitmap MemBitmap;
-	// 设备描述表初始化
+	// 设备描述表初始化 
 	memDC.CreateCompatibleDC(NULL);
-	// 建立与屏幕显示兼容的内存显示设备
+	// 建立与屏幕显示兼容的内存显示设备 
 	MemBitmap.CreateCompatibleBitmap(&dc, m_Rect.Width(), m_Rect.Height());
-	// 选取空白位图
+	// 选取空白位图 
 	memDC.SelectObject(MemBitmap);
-	memDC.FillSolidRect(0, 0, m_Rect.Width(), m_Rect.Height(), RGB(34, 34, 34));
-	//画图
+	memDC.FillSolidRect(0, 0, m_Rect.Width(), m_Rect.Height(), RGB(255, 255, 255));
+	//画图 
 	Draw(&memDC);
-	//拷贝到控件DC
+	//拷贝到控件DC 
 	dc.BitBlt(0, 0, m_Rect.Width(), m_Rect.Height(), &memDC, 0, 0, SRCCOPY);
 	MemBitmap.DeleteObject();
 
@@ -361,4 +345,13 @@ void Mypic::GDIInvalidate()
 	memDC.DeleteDC();
 	dc.Detach();
 	::ReleaseDC(m_hWnd, hdc);
+}
+
+
+void CVIEW::OnPaint()
+{
+	CPaintDC dc(this); // device context for painting
+					   // TODO: 在此处添加消息处理程序代码
+					   // 不为绘图消息调用 CDialogEx::OnPaint()
+	GDIInvalidate();
 }
