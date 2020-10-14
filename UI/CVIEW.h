@@ -5,7 +5,15 @@
 #define WIDTH 800        //图片控件的宽（初始状态）
 #define HEIGHT 600        //图片控件的高（初始状态）
 #define SCALES 0.1f		  //缩放的比例值
+#define MIN_SCALES 0.2f		  //缩放的比例值
 // CVIEW 对话框
+
+struct VIEW
+{
+
+};
+
+
 
 class CVIEW : public CDialogEx
 {
@@ -51,12 +59,20 @@ private:
 	PointF    m_PtStart; //按下鼠标中键，记录当前的m_imgX,m_imgY
 	PointF    m_mouseDown; //按下鼠标中键时，鼠标在图片控件中的位置；
 	bool     m_mousepressed; //记录是否按下了鼠标中键
+	//平移
+	REAL      m_rimgX; //图片左上角X轴偏移量
+	REAL      m_rimgY; //图片左上角Y轴偏移量
 
+	//缩放
+	REAL      m_simgX; //图片左上角X轴偏移量
+	REAL      m_simgY; //图片左上角Y轴偏移量
 	void Draw(CDC *pDC);//画图片
 	void GDIInvalidate();///双缓冲绘图
-
+	bool Isoutpic();//检测是否超框
+	void DrawRect(CDC *pDC);//画矩形
 private:
-
+	float Imgwidth;
+	float ImgHeight;
 
 	//void initUIDlgs();
 
@@ -65,7 +81,8 @@ private:
 	//绘制参数
 	CPoint m_StartPoint;
 	CPoint m_EndPoint;
-	COLORREF m_Color;
+
+	COLORREF* p_Color;//笔刷颜色
 
 public:
 	//初始化接口
@@ -75,7 +92,9 @@ public:
 
 	void setDlgPic(CString pic);//设置显示图片名
 
+	CPoint getMousePoint();//获取鼠标点对应的图片坐标
 
+	
 protected:
 	void CImageToMat(CImage& cimage, cv::Mat& mat);
 	CImage * MatToCImage(cv::Mat& mat, CImage *cimage);

@@ -237,6 +237,7 @@
     <ResourceCompile Include="UI.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\bgh.bmp" />
     <Image Include="res\UI.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

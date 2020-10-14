@@ -16,10 +16,10 @@ using namespace std;
 #define new DEBUG_NEW
 #endif
 
-// 定义子窗口格局
-#define SUB_DLG_NUM (2)
-#define ROW_NUM (2)
-#define COLUM_NUM (1)
+//// 定义子窗口格局
+//#define SUB_DLG_NUM (2)
+//#define ROW_NUM (1)
+//#define COLUM_NUM (2)
 
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
@@ -85,13 +85,13 @@ BEGIN_MESSAGE_MAP(CUIDlg, CDialogEx)
 	ON_WM_CLOSE()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_WM_MOUSEMOVE()
+	/*ON_WM_MOUSEMOVE()
 	ON_WM_MOUSEWHEEL()
 	ON_WM_MBUTTONDOWN()
 	ON_WM_MBUTTONUP()
 	ON_WM_LBUTTONDBLCLK()
 	ON_WM_LBUTTONDOWN()
-	ON_WM_LBUTTONUP()
+	ON_WM_LBUTTONUP()*/
 	ON_WM_SIZE()
 	
 	ON_WM_RBUTTONUP()
@@ -181,7 +181,17 @@ void CUIDlg::OnPaint()
 	}
 	else
 	{
-		
+		CPaintDC   dc(this);
+		CRect rect;
+		GetClientRect(&rect);
+		CDC   dcMem;
+		dcMem.CreateCompatibleDC(&dc);
+		CBitmap   bmpBackground;
+		bmpBackground.LoadBitmap(IDB_BITMAP1);  //对话框的背景图片  
+		BITMAP   bitmap;
+		bmpBackground.GetBitmap(&bitmap);
+		CBitmap   *pbmpOld = dcMem.SelectObject(&bmpBackground);
+		dc.StretchBlt(0, 0, rect.Width(), rect.Height(), &dcMem, 0, 0, bitmap.bmWidth, bitmap.bmHeight, SRCCOPY);
 		CDialogEx::OnPaint();
 	}
 }
@@ -203,37 +213,52 @@ HCURSOR CUIDlg::OnQueryDragIcon()
 
 void CUIDlg::initUIDlgs()
 {
-	int iColum = COLUM_NUM;
-	int iRow = ROW_NUM;
-	m_views = new CVIEW[SUB_DLG_NUM];
+	//int iColum = COLUM_NUM;
+	//int iRow = ROW_NUM;
+	m_views = new CVIEW[2];
 
-	int iScreenWidth = GetSystemMetrics(SM_CXSCREEN);
-	int iScreenHeight = GetSystemMetrics(SM_CYSCREEN);
+	//int iScreenWidth = GetSystemMetrics(SM_CXSCREEN);
+	//int iScreenHeight = GetSystemMetrics(SM_CYSCREEN);
 
-	MoveWindow(0, 0, iScreenWidth, iScreenHeight);
+	//MoveWindow(0, 0, iScreenWidth, iScreenHeight);
 
-	CRect rectMainDlg;
-	GetClientRect(&rectMainDlg);
-
-	for (int i = 0; i < SUB_DLG_NUM; i++)
+	//CRect rectMainDlg;
+	//GetClientRect(&rectMainDlg);
+	//
+	CRect rect[2];
+	rect[0].SetRect(285, 225, 1085, 825);
+	rect[1].SetRect(1090, 225, 1890, 825);
+	for (int i = 0; i < 2; i++)
 	{
-		CRect rect;
+		/*CRect rect;*/
 		/*int nWidth = rectMainDlg.Width() / iColum;
 		int nHeight = rectMainDlg.Height() / iRow;*/
-		int nWidth = 800;
-		int nHeight = 600;
+		/*int nWidth = 800;
+		int nHeight = 600;*/
 
-		rect.SetRect(
-			rectMainDlg.TopLeft().x + (i % iColum) * nWidth,
-			rectMainDlg.TopLeft().y + (i / iColum) * nHeight,
-			rectMainDlg.TopLeft().x + (i % iColum + 1) * nWidth,
-			rectMainDlg.TopLeft().y + ((i / iColum) + 1) * nHeight);
-
-		m_views[i].setDlgRect(&rect);
+		
+		m_views[i].setDlgRect(&rect[i]);
 		m_views[i].Create(IDD_VIEW, this);
 		m_views[i].ShowWindow(SW_SHOW);
+		m_views[i].setDlgPic(_T("456.bmp"));
 	}
+
 	
+
+	/*CRect rect1,rect2;
+	
+	int nWidth = 800;
+	int nHeight = 600;
+	
+	m_views[0].setDlgRect(&rect1);
+	m_views[0].Create(IDD_VIEW, this);
+	m_views[0].ShowWindow(SW_SHOW);
+
+	
+	m_views[1].setDlgRect(&rect2);
+	m_views[1].Create(IDD_VIEW, this);
+	m_views[1].ShowWindow(SW_SHOW);
+	*/
 }
 void CUIDlg::OnClose()
 {
@@ -264,17 +289,13 @@ BOOL CUIDlg::CanExit()
 		ShowWindow(SW_HIDE);
 		return FALSE;
 	}
+	if (m_views != NULL) {
+		delete[] m_views;
+		m_views = NULL;
+	}
 
 	return TRUE;
 }
-
-
-
-
-
-
-
-
 
 
 void CUIDlg::ReSize()

@@ -5,7 +5,8 @@
 #include "UI.h"
 #include "CVIEW.h"
 #include "afxdialogex.h"
-
+#include <iostream>
+using namespace std;
 
 // CVIEW 对话框
 
@@ -14,14 +15,22 @@ IMPLEMENT_DYNAMIC(CVIEW, CDialogEx)
 CVIEW::CVIEW(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_VIEW, pParent)
 {
+	p_Color = new COLORREF(RGB(255, 0, 0));
 	m_zoom = 1.0f;
-
 	m_imgX = 0.0f;
 	m_imgY = 0.0f;
+
+
 	m_PtStart.X = 0.0f;
 	m_PtStart.Y = 0.0f;
 	m_mousepressed = false;
-	Picture = "456.bmp";
+	Picture = "./res/picbg.bmp";
+
+
+	m_rimgX = 0.0f;
+	m_rimgY = 0.0f;
+	m_simgX = 0.0f;
+	m_simgY = 0.0f;
 }
 
 CVIEW::~CVIEW()
@@ -55,14 +64,15 @@ BOOL CVIEW::OnInitDialog()
 	CDialogEx::OnInitDialog();
 
 	MoveWindow(m_Rect);//初始化界面位置
-
+	Imgwidth = m_Rect.Width();
+	ImgHeight = m_Rect.Height();
 	// TODO:  在此添加额外的初始化
 	/////////////////////控制台
 	AllocConsole();
 	FILE *stream;
 	freopen_s(&stream, "CONOUT$", "w", stdout);
 
-	//GetClientRect(m_Rect);
+	GetClientRect(m_Rect);
 	return TRUE;  // return TRUE unless you set the focus to a control
 				  // 异常: OCX 属性页应返回 FALSE
 }
@@ -93,17 +103,24 @@ void CVIEW::OnMouseMove(UINT nFlags, CPoint point)
 		REAL deltaX = point.x - m_mouseDown.X; //x轴方向偏移
 		REAL deltaY = point.y - m_mouseDown.Y; //y轴方向偏移
 
+		m_rimgX += deltaX;
+		m_rimgX += deltaY;
+		
 		m_imgX = (m_PtStart.X + (deltaX / m_zoom)); //在原始图像中X坐标偏移，这里计算的是在原始图片中的位移，原因在上面已经说明，全局的仿射变换会影响实际的位移
 		m_imgY = (m_PtStart.Y + (deltaY / m_zoom)); //在原始图像中Y坐标偏移
-		GDIInvalidate();                            //重绘
+		if (!Isoutpic()) {
+			m_imgX = m_PtStart.X;
+			m_imgY = m_PtStart.Y;
+		}
+		Invalidate(FALSE);                           //重绘
 	}
 	else if (nFlags & MK_LBUTTON) {
 		::SetCursor(hCur);
 		m_EndPoint = point;
 
-
+		Invalidate(FALSE);
 	}
-	Invalidate(FALSE);
+	
 	CDialogEx::OnMouseMove(nFlags, point);
 }
 
@@ -111,6 +128,8 @@ BOOL CVIEW::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
 	REAL oldzoom = m_zoom; //保存当前的缩放系数，用于计算当前滚动时的坐标
+	m_PtStart.X = m_imgX;
+	m_PtStart.Y = m_imgY;
 	CPoint ppt = pt;
 	CRect  rect;
 	if (zDelta == 120)
@@ -121,46 +140,71 @@ BOOL CVIEW::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 	{
 		m_zoom = m_zoom - SCALES;
 	}
+	if (m_zoom >= MIN_SCALES) {
+		GetWindowRect(rect); //注意这里的区域是窗口相对于整个屏幕的，因为cpoint pt这个点是相对于屏幕的
+		CPoint ps;
+		GetCursorPos(&ps);
+		cout << "ppt:" << ppt.x << "  " << ppt.y << endl;
+		cout << "ps:" << ps.x << "  " << ps.y << endl;
+		ppt.x -= rect.left; //计算该点在对话框中的位置
+		ppt.y -= rect.top;
 
-	GetWindowRect(rect); //注意这里的区域是窗口相对于整个屏幕的，因为cpoint pt这个点是相对于屏幕的
+		int x = ppt.x - m_Rect.left;
+		int y = ppt.y - m_Rect.top;
 
-	ppt.x -= rect.left; //计算该点在对话框中的位置
-	ppt.y -= rect.top;
+		REAL oldimagex = (x / oldzoom); //缩放前鼠标在原图中的位置
+		REAL oldimagey = (y / oldzoom);
+		/*cout << "old:" << oldimagex << "," << m_zoom << endl;*/
+		REAL newimagex = (x / m_zoom);//缩放后鼠标在原图中的位置
+		REAL newimagey = (y / m_zoom);
+		/*cout << "new:" << oldimagex << "," << m_zoom << endl;*/
+		m_imgX = newimagex - oldimagex + m_imgX; //计算原图应该的偏移
+		m_imgY = newimagey - oldimagey + m_imgY;
+		/*cout << "mouse:" << oldimagex << "," << m_zoom << endl;*/
 
-	int x = ppt.x - m_Rect.left;
-	int y = ppt.y - m_Rect.top;
-
-	REAL oldimagex = (x / oldzoom); //缩放前鼠标在原图中的位置
-	REAL oldimagey = (y / oldzoom);
-
-	REAL newimagex = (x / m_zoom);//缩放后鼠标在原图中的位置
-	REAL newimagey = (y / m_zoom);
-
-	m_imgX = newimagex - oldimagex + m_imgX; //计算原图应该的偏移
-	m_imgY = newimagey - oldimagey + m_imgY;
-
-	Invalidate(FALSE); //绘图
+		if (!Isoutpic()) {
+			m_imgX = m_PtStart.X;
+			m_imgY = m_PtStart.Y;
+			m_zoom = oldzoom;
+		}
+		Invalidate(FALSE); //绘图
+	}
+	else {
+		m_zoom = oldzoom;
+	}
 	return CDialogEx::OnMouseWheel(nFlags, zDelta, pt);
 }
 
 void CVIEW::OnMButtonDown(UINT nFlags, CPoint point)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
-	m_mousepressed = false;
+	if (nFlags & MK_MBUTTON)
+	{
+		if (!m_mousepressed)
+		{
+			m_mousepressed = true;
+			m_mouseDown.X = point.x;
+			m_mouseDown.Y = point.y;
+			m_PtStart.X = m_imgX;
+			m_PtStart.Y = m_imgY;
+		}
+
+	}
 	CDialogEx::OnMButtonDown(nFlags, point);
 }
 
 void CVIEW::OnMButtonUp(UINT nFlags, CPoint point)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
-	m_click = FALSE;
+	
+	m_mousepressed = false; 
 	CDialogEx::OnMButtonUp(nFlags, point);
 }
 
 void CVIEW::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
-
+	cout << "x:" << point.x << "  y:" << point.y << endl;
 	CDialogEx::OnLButtonDblClk(nFlags, point);
 }
 
@@ -171,15 +215,15 @@ void CVIEW::OnLButtonDown(UINT nFlags, CPoint point)
 	m_StartPoint = point;
 	m_EndPoint = point;
 
-	//GDIInvalidate();
+	GDIInvalidate();
 	CDialogEx::OnLButtonDown(nFlags, point);
 }
 
 void CVIEW::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
-	m_click = false;
-	Invalidate(FALSE);//更新界面
+	m_click = FALSE;
+	//Invalidate(FALSE);//更新界面
 	CDialogEx::OnLButtonUp(nFlags, point);
 }
 
@@ -192,7 +236,7 @@ void CVIEW::OnRButtonUp(UINT nFlags, CPoint point)
 
 void CVIEW::setDlgRect(CRect rect)
 {
-	m_Rect = rect;
+	m_Rect=rect;
 	
 }
 
@@ -200,6 +244,15 @@ void CVIEW::setDlgPic(CString pic)
 {
 	Picture = pic;
 	Invalidate(FALSE);//更新界面
+}
+
+CPoint CVIEW::getMousePoint()
+{
+	float w = Imgwidth * m_zoom;
+	float h = ImgHeight * m_zoom;
+
+
+	return CPoint();
 }
 
 void CVIEW::CImageToMat(CImage & cimage, cv::Mat & mat)
@@ -327,6 +380,8 @@ void CVIEW::Draw(CDC * pDC)
 	graph.SetInterpolationMode(InterpolationModeHighQualityBilinear);//设置缩放质量 
 	graph.ScaleTransform(m_zoom, m_zoom);//缩放 
 	graph.DrawImage(&img, m_imgX, m_imgY);//m_imgX,m_imgY是原图应该偏移的量
+	printf("m_imgX= %f \n", m_imgX);
+	printf("m_imgY= %f \n", m_imgY);
 }
 
 void CVIEW::GDIInvalidate()
@@ -344,21 +399,42 @@ void CVIEW::GDIInvalidate()
 	// 选取空白位图 
 	memDC.SelectObject(MemBitmap);
 	memDC.FillSolidRect(0, 0, m_Rect.Width(), m_Rect.Height(), RGB(34,34,34));
+	
 	//画图 
 	Draw(&memDC);
 	//拷贝到控件DC 
 	dc.BitBlt(0, 0, m_Rect.Width(), m_Rect.Height(), &memDC, 0, 0, SRCCOPY);
 	MemBitmap.DeleteObject();
 
-	//画矩形
-	dc.SelectStockObject(NULL_BRUSH);
-	CPen NewPen(PS_SOLID, 1, m_Color);
-	dc.SelectObject(&NewPen);
-	dc.Rectangle(&CRect(m_StartPoint, m_EndPoint));
+	DrawRect(&dc);
 
 	memDC.DeleteDC();
 	dc.Detach();
 	::ReleaseDC(m_hWnd, hdc);
+}
+
+bool CVIEW::Isoutpic()
+{
+	if (m_imgX > (20 - Imgwidth)&m_imgX < (Imgwidth - 20)) 
+	{
+		if (m_imgY > (20 - ImgHeight)&m_imgY < (ImgHeight - 20)) {
+			return true;
+		}
+	}
+	return false;
+		
+}
+
+void CVIEW::DrawRect(CDC * pDC)
+{
+	if (m_click) {
+		//画矩形
+		pDC->SelectStockObject(NULL_BRUSH);
+		CPen NewPen(PS_SOLID, 1, *p_Color);
+		pDC->SelectObject(&NewPen);
+		pDC->Rectangle(&CRect(m_StartPoint, m_EndPoint));
+	}
+	
 }
 
 
