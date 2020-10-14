@@ -1,0 +1,29 @@
+﻿// UI.idl: UI.exe 的类型库源
+
+// 此文件将由 MIDL 编译器处理以产生
+// 类型库(UI.tlb)。
+
+[ uuid(e482bc1a-d0e4-4e40-a938-a878525b4789), version(1.0) ]
+library UI
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	//  CUIDoc 的主调度接口
+
+	[ uuid(29abb7fd-f2db-4b88-ae99-db5a0da9ac84) ]
+	dispinterface IUI
+	{
+		properties:
+
+		methods:
+	};
+
+	//  CUIDoc 的类信息
+
+	[ uuid(bb289a1f-ad2e-45b5-b33c-7d66a40ea0c0) ]
+	coclass UI
+	{
+		[default] dispinterface IUI;
+	};
+};
