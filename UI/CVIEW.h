@@ -69,11 +69,14 @@ private:
 	void Draw(CDC *pDC);//画图片
 	void GDIInvalidate();///双缓冲绘图
 	bool Isoutpic();//检测是否超框
+
+	bool IsOnpic();//检测是否在图片上
 	void DrawRect(CDC *pDC);//画矩形
 private:
 	float Imgwidth;
 	float ImgHeight;
 
+	float w,h;
 	//void initUIDlgs();
 
 	///画矩形

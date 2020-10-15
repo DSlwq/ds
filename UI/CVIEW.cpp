@@ -144,8 +144,8 @@ BOOL CVIEW::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 		GetWindowRect(rect); //注意这里的区域是窗口相对于整个屏幕的，因为cpoint pt这个点是相对于屏幕的
 		CPoint ps;
 		GetCursorPos(&ps);
-		cout << "ppt:" << ppt.x << "  " << ppt.y << endl;
-		cout << "ps:" << ps.x << "  " << ps.y << endl;
+		/*cout << "ppt:" << ppt.x << "  " << ppt.y << endl;
+		cout << "ps:" << ps.x << "  " << ps.y << endl;*/
 		ppt.x -= rect.left; //计算该点在对话框中的位置
 		ppt.y -= rect.top;
 
@@ -205,6 +205,27 @@ void CVIEW::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
 	cout << "x:" << point.x << "  y:" << point.y << endl;
+	w =  (m_imgX * m_zoom);//左上角坐标
+	h =  (m_imgY * m_zoom);
+	//显示坐标起点
+	cout << "youxia:" << w << "\n" << h << endl;
+
+	w = (point.x -w ) / m_zoom;
+	h = (point.y-h  ) / m_zoom;
+
+	cout << "youxia:" << w << "\n" << h << endl;
+	/*if (m_imgX < 0) {
+		if (point.x < (Imgwidth + m_imgX)) {
+
+		}
+	}
+	else {
+		if (point.x < (Imgwidth - m_imgX)) {
+
+		}
+	}*/
+	
+	getMousePoint();
 	CDialogEx::OnLButtonDblClk(nFlags, point);
 }
 
@@ -248,10 +269,8 @@ void CVIEW::setDlgPic(CString pic)
 
 CPoint CVIEW::getMousePoint()
 {
-	float w = Imgwidth * m_zoom;
-	float h = ImgHeight * m_zoom;
-
-
+	//左上坐标（-(m_imgX * m_zoom)，-(m_imgY * m_zoom)）
+	
 	return CPoint();
 }
 
@@ -380,8 +399,10 @@ void CVIEW::Draw(CDC * pDC)
 	graph.SetInterpolationMode(InterpolationModeHighQualityBilinear);//设置缩放质量 
 	graph.ScaleTransform(m_zoom, m_zoom);//缩放 
 	graph.DrawImage(&img, m_imgX, m_imgY);//m_imgX,m_imgY是原图应该偏移的量
-	printf("m_imgX= %f \n", m_imgX);
-	printf("m_imgY= %f \n", m_imgY);
+	//graph.ScaleTransform(1, 1);//缩放
+	//graph.DrawImage(&img, 400, 0);//m_imgX,m_imgY是原图应该偏移的量
+	/*printf("m_imgX= %f \n", m_imgX);
+	printf("m_imgY= %f \n", m_imgY);*/
 }
 
 void CVIEW::GDIInvalidate()
@@ -423,6 +444,13 @@ bool CVIEW::Isoutpic()
 	}
 	return false;
 		
+}
+
+bool CVIEW::IsOnpic()
+{
+	
+
+	return false;
 }
 
 void CVIEW::DrawRect(CDC * pDC)
