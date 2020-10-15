@@ -45,8 +45,10 @@ protected:
 
 private:
 
+	BOOL      IsDraw; //画矩形开关
+	BOOL      Ispic; //图片是否存在
+	BOOL      Issend; //是否发送坐标
 	CRect     m_Rect; //对话框的矩形区域
-
 	REAL      m_zoom; //缩放系数
 	REAL      m_imgX; //图片左上角X轴偏移量
 	REAL      m_imgY; //图片左上角Y轴偏移量
@@ -89,7 +91,9 @@ public:
 
 	void setDlgPic(CString pic);//设置显示图片名
 
+	void setDlgDrawRect( BOOL ISDrawRect);//画矩形开关
 	
+	void setDlgSend(BOOL IsSend);//鼠标位置发送开关
 
 	
 protected:

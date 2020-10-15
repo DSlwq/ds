@@ -20,8 +20,9 @@ CVIEW::CVIEW(CWnd* pParent /*=nullptr*/)
 	m_zoom = 1.0f;
 	m_imgX = 0.0f;
 	m_imgY = 0.0f;
-
-
+	IsDraw = false;
+	Ispic = false;
+	Issend = false;
 	m_PtStart.X = 0.0f;
 	m_PtStart.Y = 0.0f;
 	m_mousepressed = false;
@@ -205,26 +206,30 @@ void CVIEW::OnMButtonUp(UINT nFlags, CPoint point)
 void CVIEW::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
-	/*cout << "x:" << point.x << "  y:" << point.y << endl;*/
-	w =  (m_imgX * m_zoom);//左上角坐标
-	h =  (m_imgY * m_zoom);
-	//显示坐标起点
-	/*cout << "youxia:" << w << "\n" << h << endl;*/
+	if (Ispic&Issend) {
+		w = (m_imgX * m_zoom);//左上角坐标
+		h = (m_imgY * m_zoom);
+		//显示坐标起点
 
-	w = ((point.x -w ) / m_zoom)*(WIDTH/ Imgwidth);
-	h = ((point.y-h  ) / m_zoom)*(HEIGHT/ ImgHeight);
 
-	CPoint pp;
-	pp.x = w;
-	pp.y = h;
+		w = ((point.x - w) / m_zoom)*(WIDTH / Imgwidth);
+		h = ((point.y - h) / m_zoom)*(HEIGHT / ImgHeight);
+		if (w >= 0 & w <= WIDTH) {
+			if (h >= 0 & h <= HEIGHT) {
+				CPoint pp;
+				pp.x = w;
+				pp.y = h;
 
-	//cout << "youxia:" << w << "\n" << h << endl;
+				//cout << "youxia:" << w << "\n" << h << endl;
 
-	////向主窗口发送鼠标位置
-	CUIDlg * adlg = (CUIDlg *)this->GetParent();
-	adlg->getMousePoint(&pp);
-	adlg->UpdateData(FALSE);
-
+				////向主窗口发送鼠标位置
+				CUIDlg * adlg = (CUIDlg *)this->GetParent();
+				adlg->getMousePoint(&pp);
+				adlg->UpdateData(FALSE);
+			}
+		}
+	}
+	
 	
 	CDialogEx::OnLButtonDblClk(nFlags, point);
 }
@@ -236,7 +241,7 @@ void CVIEW::OnLButtonDown(UINT nFlags, CPoint point)
 	m_StartPoint = point;
 	m_EndPoint = point;
 
-	GDIInvalidate();
+	//GDIInvalidate();
 	CDialogEx::OnLButtonDown(nFlags, point);
 }
 
@@ -264,7 +269,18 @@ void CVIEW::setDlgRect(CRect rect)
 void CVIEW::setDlgPic(CString pic)
 {
 	Picture = pic;
+	Ispic = true;
 	Invalidate(FALSE);//更新界面
+}
+
+void CVIEW::setDlgDrawRect(BOOL ISDrawRect)
+{
+	IsDraw = ISDrawRect;
+}
+
+void CVIEW::setDlgSend(BOOL IsSend)
+{
+	Issend = IsSend;
 }
 
 
@@ -450,7 +466,7 @@ bool CVIEW::IsOnpic()
 
 void CVIEW::DrawRect(CDC * pDC)
 {
-	if (m_click) {
+	if (m_click&IsDraw) {
 		//画矩形
 		pDC->SelectStockObject(NULL_BRUSH);
 		CPen NewPen(PS_SOLID, 1, *p_Color);

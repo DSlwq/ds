@@ -215,50 +215,25 @@ void CUIDlg::initUIDlgs()
 {
 	//int iColum = COLUM_NUM;
 	//int iRow = ROW_NUM;
-	m_views = new CVIEW[2];
 
-	//int iScreenWidth = GetSystemMetrics(SM_CXSCREEN);
+	//int iScreenWidth = GetSystemMetrics(SM_CXSCREEN);//根据显示器分辨率设置软件界面大小
 	//int iScreenHeight = GetSystemMetrics(SM_CYSCREEN);
-
 	//MoveWindow(0, 0, iScreenWidth, iScreenHeight);
 
-	//CRect rectMainDlg;
-	//GetClientRect(&rectMainDlg);
-	//
+	m_views = new CVIEW[2];
 	CRect rect[2];
 	rect[0].SetRect(285, 225, 1085, 825);
 	rect[1].SetRect(1090, 225, 1890, 825);
-	for (int i = 0; i < 2; i++)
-	{
-		/*CRect rect;*/
-		/*int nWidth = rectMainDlg.Width() / iColum;
-		int nHeight = rectMainDlg.Height() / iRow;*/
-		/*int nWidth = 800;
-		int nHeight = 600;*/
 
-		
-		m_views[i].setDlgRect(&rect[i]);
-		m_views[i].Create(IDD_VIEW, this);
-		m_views[i].ShowWindow(SW_SHOW);
-		m_views[i].setDlgPic(_T("456.bmp"));
-	}
-
-	
-
-	/*CRect rect1,rect2;
-	
-	int nWidth = 800;
-	int nHeight = 600;
-	
-	m_views[0].setDlgRect(&rect1);
+	m_views[0].setDlgRect(&rect[0]);
 	m_views[0].Create(IDD_VIEW, this);
 	m_views[0].ShowWindow(SW_SHOW);
-
-	
-	m_views[1].setDlgRect(&rect2);
+	m_views[0].setDlgPic(_T("456.bmp"));
+	Sleep(100);
+	m_views[1].setDlgRect(&rect[1]);
 	m_views[1].Create(IDD_VIEW, this);
 	m_views[1].ShowWindow(SW_SHOW);
-	*/
+	//m_views[1].setDlgPic(_T(".bmp"));
 }
 void CUIDlg::OnClose()
 {
@@ -290,6 +265,7 @@ BOOL CUIDlg::CanExit()
 		return FALSE;
 	}
 	if (m_views != NULL) {
+		//清理显示界面指针
 		delete[] m_views;
 		m_views = NULL;
 	}
