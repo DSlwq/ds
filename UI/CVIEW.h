@@ -2,17 +2,11 @@
 #include "CInitGdiplus.h"
 #include "opencv2/opencv.hpp"
 
-#define WIDTH 800        //图片控件的宽（初始状态）
-#define HEIGHT 600        //图片控件的高（初始状态）
+#define WIDTH 4000        //图片的宽（初始状态）
+#define HEIGHT 3000        //图片的高（初始状态）
 #define SCALES 0.1f		  //缩放的比例值
 #define MIN_SCALES 0.2f		  //缩放的比例值
 // CVIEW 对话框
-
-struct VIEW
-{
-
-};
-
 
 
 class CVIEW : public CDialogEx
@@ -95,7 +89,7 @@ public:
 
 	void setDlgPic(CString pic);//设置显示图片名
 
-	CPoint getMousePoint();//获取鼠标点对应的图片坐标
+	
 
 	
 protected:

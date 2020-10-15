@@ -49,6 +49,7 @@ protected:
 
 
 private:
+
 	CVIEW* m_views;
 	
 	void initUIDlgs();
@@ -64,7 +65,7 @@ private:
 
 public:
 	
-	
+	CPoint getMousePoint(CPoint* p);//获取鼠标点对应的图片坐标
 	
 	
 	

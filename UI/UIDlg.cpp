@@ -351,6 +351,12 @@ void CUIDlg::upListRect()
 	}
 }
 
+CPoint CUIDlg::getMousePoint(CPoint * p)
+{
+	cout << "坐标：" << p->x << " , " << p->y << endl;
+	return CPoint();
+}
+
 
 
 

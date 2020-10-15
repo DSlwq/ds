@@ -6,6 +6,7 @@
 #include "CVIEW.h"
 #include "afxdialogex.h"
 #include <iostream>
+#include "UIDlg.h"
 using namespace std;
 
 // CVIEW 对话框
@@ -204,28 +205,27 @@ void CVIEW::OnMButtonUp(UINT nFlags, CPoint point)
 void CVIEW::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
-	cout << "x:" << point.x << "  y:" << point.y << endl;
+	/*cout << "x:" << point.x << "  y:" << point.y << endl;*/
 	w =  (m_imgX * m_zoom);//左上角坐标
 	h =  (m_imgY * m_zoom);
 	//显示坐标起点
-	cout << "youxia:" << w << "\n" << h << endl;
+	/*cout << "youxia:" << w << "\n" << h << endl;*/
 
-	w = (point.x -w ) / m_zoom;
-	h = (point.y-h  ) / m_zoom;
+	w = ((point.x -w ) / m_zoom)*(WIDTH/ Imgwidth);
+	h = ((point.y-h  ) / m_zoom)*(HEIGHT/ ImgHeight);
 
-	cout << "youxia:" << w << "\n" << h << endl;
-	/*if (m_imgX < 0) {
-		if (point.x < (Imgwidth + m_imgX)) {
+	CPoint pp;
+	pp.x = w;
+	pp.y = h;
 
-		}
-	}
-	else {
-		if (point.x < (Imgwidth - m_imgX)) {
+	//cout << "youxia:" << w << "\n" << h << endl;
 
-		}
-	}*/
+	////向主窗口发送鼠标位置
+	CUIDlg * adlg = (CUIDlg *)this->GetParent();
+	adlg->getMousePoint(&pp);
+	adlg->UpdateData(FALSE);
+
 	
-	getMousePoint();
 	CDialogEx::OnLButtonDblClk(nFlags, point);
 }
 
@@ -267,12 +267,7 @@ void CVIEW::setDlgPic(CString pic)
 	Invalidate(FALSE);//更新界面
 }
 
-CPoint CVIEW::getMousePoint()
-{
-	//左上坐标（-(m_imgX * m_zoom)，-(m_imgY * m_zoom)）
-	
-	return CPoint();
-}
+
 
 void CVIEW::CImageToMat(CImage & cimage, cv::Mat & mat)
 {
